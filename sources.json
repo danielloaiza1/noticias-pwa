@@ -1,0 +1,95 @@
+{
+  "sections": [
+    { "id": "barranquilla", "name": "Barranquilla" },
+    { "id": "colombia", "name": "Colombia" },
+    { "id": "paises-bajos", "name": "Países Bajos" },
+    { "id": "mundo", "name": "Mundo" }
+  ],
+  "sources": [
+    {
+      "name": "Google Noticias · Barranquilla",
+      "section": "barranquilla",
+      "lang": "es",
+      "url": "https://news.google.com/rss/search?q=Barranquilla+when%3A3d&hl=es-419&gl=CO&ceid=CO:es-419"
+    },
+    {
+      "name": "El Heraldo",
+      "section": "barranquilla",
+      "lang": "es",
+      "url": "https://news.google.com/rss/search?q=site%3Aelheraldo.co+when%3A3d&hl=es-419&gl=CO&ceid=CO:es-419"
+    },
+    {
+      "name": "Zona Cero",
+      "section": "barranquilla",
+      "lang": "es",
+      "url": "https://news.google.com/rss/search?q=site%3Azonacero.com+when%3A3d&hl=es-419&gl=CO&ceid=CO:es-419"
+    },
+    {
+      "name": "El Tiempo",
+      "section": "colombia",
+      "lang": "es",
+      "url": "https://www.eltiempo.com/rss/colombia.xml"
+    },
+    {
+      "name": "El Espectador",
+      "section": "colombia",
+      "lang": "es",
+      "url": "https://news.google.com/rss/search?q=site%3Aelespectador.com+when%3A2d&hl=es-419&gl=CO&ceid=CO:es-419"
+    },
+    {
+      "name": "La Silla Vacía",
+      "section": "colombia",
+      "lang": "es",
+      "url": "https://www.lasillavacia.com/feed/"
+    },
+    {
+      "name": "La Silla Vacía (vía Google Noticias)",
+      "section": "colombia",
+      "lang": "es",
+      "url": "https://news.google.com/rss/search?q=site%3Alasillavacia.com+when%3A7d&hl=es-419&gl=CO&ceid=CO:es-419"
+    },
+    {
+      "name": "Google Noticias · Colombia",
+      "section": "colombia",
+      "lang": "es",
+      "url": "https://news.google.com/rss/headlines/section/geo/Colombia?hl=es-419&gl=CO&ceid=CO:es-419"
+    },
+    {
+      "name": "NOS",
+      "section": "paises-bajos",
+      "lang": "nl",
+      "noSummary": true,
+      "url": "https://feeds.nos.nl/nosnieuwsalgemeen"
+    },
+    {
+      "name": "DutchNews.nl",
+      "section": "paises-bajos",
+      "lang": "en",
+      "url": "https://www.dutchnews.nl/feed/"
+    },
+    {
+      "name": "Google Noticias · Países Bajos",
+      "section": "paises-bajos",
+      "lang": "es",
+      "url": "https://news.google.com/rss/search?q=%22Pa%C3%ADses+Bajos%22+OR+Holanda+when%3A3d&hl=es-419&gl=CO&ceid=CO:es-419"
+    },
+    {
+      "name": "Google Noticias · Titulares",
+      "section": "mundo",
+      "lang": "es",
+      "url": "https://news.google.com/rss?hl=es-419&gl=CO&ceid=CO:es-419"
+    },
+    {
+      "name": "BBC Mundo",
+      "section": "mundo",
+      "lang": "es",
+      "url": "https://feeds.bbci.co.uk/mundo/rss.xml"
+    },
+    {
+      "name": "DW Español",
+      "section": "mundo",
+      "lang": "es",
+      "url": "https://rss.dw.com/xml/rss-sp-all"
+    }
+  ]
+}
