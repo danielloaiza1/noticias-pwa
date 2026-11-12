@@ -19,6 +19,7 @@ from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta, timezone
 from email.utils import parsedate_to_datetime
 from pathlib import Path
+from urllib.parse import urljoin
 
 ROOT = Path(__file__).resolve().parent.parent
 UA = "Mozilla/5.0 (compatible; NoticiasPWA/1.0; lector personal de noticias)"
@@ -113,6 +114,50 @@ def parse_feed(data):
     return out
 
 
+OG_TAG = re.compile(r'<meta[^>]+?(?:property|name)=["\'](?:og:image(?::secure_url)?|twitter:image)["\'][^>]*?>', re.I)
+CONTENT_ATTR = re.compile(r'content=["\']([^"\']+)["\']', re.I)
+MAX_ENRICH = 60
+
+
+def og_image(url):
+    """Lee el comienzo de la página del artículo y devuelve su og:image (o '')."""
+    try:
+        req = urllib.request.Request(url, headers={"User-Agent": UA})
+        with urllib.request.urlopen(req, timeout=6) as resp:
+            if "html" not in (resp.headers.get("Content-Type") or "text/html"):
+                return ""
+            final_url = resp.geturl()
+            page = resp.read(250_000).decode("utf-8", "ignore")
+    except Exception:  # noqa: BLE001
+        return ""
+    head = page.split("</head>", 1)[0]
+    for tag in OG_TAG.findall(head):
+        m = CONTENT_ATTR.search(tag)
+        if m:
+            img = urljoin(final_url, html.unescape(m.group(1)).strip())
+            if img.startswith(("http://", "https://", "file://")):
+                return https(img)
+    return ""
+
+
+def enrich_images(items):
+    """Completa la imagen de las noticias que no la traen en el feed.
+
+    Se omiten Google Noticias (los enlaces son redirecciones) y las fuentes con
+    noSummary (NOS: solo titular y enlace según sus condiciones de uso).
+    """
+    todo = [
+        i for i in items
+        if not i["image"] and not i.get("_noenrich") and "news.google.com" not in i["link"]
+    ]
+    todo.sort(key=lambda i: i["published"] or "", reverse=True)
+    todo = todo[:MAX_ENRICH]
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        for item, img in zip(todo, pool.map(lambda i: og_image(i["link"]), todo)):
+            item["image"] = img
+    return sum(1 for i in todo if i["image"])
+
+
 def download(url, tries=2):
     last = None
     for attempt in range(tries):
@@ -158,6 +203,7 @@ def load_source(src):
             "published": e["date"].isoformat() if e["date"] else None,
             "summary": summary,
             "image": e["image"],
+            "_noenrich": bool(src.get("noSummary")),
         })
     status["ok"] = True
     status["count"] = len(items)
@@ -196,6 +242,11 @@ def main():
             seen_l.add(it["link"])
             kept.append(it)
         final.extend(kept[:MAX_PER_SECTION])
+
+    found = enrich_images(final)
+    print(f"Imágenes obtenidas de los artículos: {found}")
+    for it in final:
+        it.pop("_noenrich", None)
 
     payload = {
         "generatedAt": now.isoformat(),
