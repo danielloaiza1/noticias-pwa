@@ -41,6 +41,20 @@
 
   <nav id="tabs" class="dock" role="tablist" aria-label="Secciones"></nav>
 
+  <div id="sheet" class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title" hidden>
+    <div class="sheet-bar">
+      <button id="sheet-close" class="sheet-btn" type="button" aria-label="Cerrar">
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+      </button>
+      <div class="sheet-heading">
+        <div id="sheet-title" class="sheet-title"></div>
+        <div class="sheet-hint">¿En blanco? Ese sitio no se deja incrustar: «Abrir ↗»</div>
+      </div>
+      <a id="sheet-open" class="sheet-open" href="#" target="_blank" rel="noopener noreferrer">Abrir ↗</a>
+    </div>
+    <div id="sheet-body" class="sheet-body"></div>
+  </div>
+
   <script src="app.js"></script>
 </body>
 </html>

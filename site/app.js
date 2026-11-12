@@ -80,6 +80,12 @@
     a.href = safeUrl(item.link);
     a.target = "_blank";
     a.rel = "noopener noreferrer";
+    a.addEventListener("click", function (e) {
+      // Clic normal: se abre en la hoja de la app. Con Ctrl/Cmd/Mayús o rueda: pestaña nueva.
+      if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      e.preventDefault();
+      openSheet(item);
+    });
     return a;
   }
 
@@ -264,6 +270,77 @@
     renderMain();
     renderSources();
   }
+
+  // --- hoja de lectura ---
+  var $sheet = document.getElementById("sheet");
+  var $sheetBody = document.getElementById("sheet-body");
+  var $sheetTitle = document.getElementById("sheet-title");
+  var $sheetOpen = document.getElementById("sheet-open");
+  var sheetOpen = false;
+
+  // Los enlaces de Google Noticias son redirecciones que Google no deja incrustar.
+  function embeddable(url) {
+    try { return new URL(url).hostname !== "news.google.com"; } catch (e) { return false; }
+  }
+
+  function previewOf(item) {
+    var box = el("div", "preview");
+    if (item.image) {
+      var img = el("img", "pv-img");
+      img.alt = "";
+      img.referrerPolicy = "no-referrer";
+      img.src = item.image;
+      img.onerror = function () { img.remove(); };
+      box.appendChild(img);
+    }
+    box.appendChild(kicker(item));
+    box.appendChild(el("h2", "", item.title));
+    if (item.summary) box.appendChild(el("p", "", item.summary));
+    box.appendChild(el("p", "pv-note", "Este enlace no se puede mostrar dentro de la app."));
+    var go = el("a", "pv-go", "Abrir artículo ↗");
+    go.href = safeUrl(item.link);
+    go.target = "_blank";
+    go.rel = "noopener noreferrer";
+    box.appendChild(go);
+    return box;
+  }
+
+  function openSheet(item) {
+    $sheetBody.textContent = "";
+    $sheetTitle.textContent = item.source + " · " + item.title;
+    $sheetOpen.href = safeUrl(item.link);
+    $sheet.querySelector(".sheet-hint").hidden = !embeddable(item.link);
+    if (embeddable(item.link)) {
+      var f = el("iframe", "sheet-frame");
+      f.title = item.title;
+      f.referrerPolicy = "no-referrer";
+      // Sin allow-top-navigation: la página no puede sacar a la app de su sitio.
+      f.setAttribute("sandbox", "allow-scripts allow-same-origin allow-popups allow-forms");
+      f.src = safeUrl(item.link);
+      $sheetBody.appendChild(f);
+    } else {
+      $sheetBody.appendChild(previewOf(item));
+    }
+    $sheet.hidden = false;
+    document.body.style.overflow = "hidden";
+    if (!sheetOpen) {
+      sheetOpen = true;
+      try { history.pushState({ sheet: true }, ""); } catch (e) { /* sin historial */ }
+    }
+  }
+
+  function closeSheet(fromPop) {
+    if (!sheetOpen) return;
+    sheetOpen = false;
+    $sheet.hidden = true;
+    $sheetBody.textContent = ""; // descarga la página y detiene cualquier audio o vídeo
+    document.body.style.overflow = "";
+    if (!fromPop && history.state && history.state.sheet) history.back();
+  }
+
+  document.getElementById("sheet-close").addEventListener("click", function () { closeSheet(false); });
+  window.addEventListener("popstate", function () { closeSheet(true); });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeSheet(false); });
 
   // --- carga ---
   function load() {
